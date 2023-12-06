@@ -1,29 +1,20 @@
 pipeline {
     agent any
-    
-    stages{
-        stage("Code"){
-            steps{
-                git url: "https://github.com/LondheShubham153/node-todo-cicd.git", branch: "master"
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: "git 'https://github.com/ABHISHEK-KUMAR-14022001/node-todo-cicd.git'", branch: "master"
             }
         }
         stage("Build & Test"){
             steps{
-                sh "docker build . -t node-app-test-new"
+                sh 'docker build -t node-app .'
             }
         }
-        stage("Push to DockerHub"){
+         stage("Build & Test"){
             steps{
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker tag node-app-test-new ${env.dockerHubUser}/node-app-test-new:latest"
-                    sh "docker push ${env.dockerHubUser}/node-app-test-new:latest" 
-                }
-            }
-        }
-        stage("Deploy"){
-            steps{
-                sh "docker-compose down && docker-compose up -d"
+                sh 'docker run -d -p 8000:8000 --name node-app-todo node-app'
             }
         }
     }
