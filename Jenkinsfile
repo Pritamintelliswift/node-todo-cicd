@@ -14,7 +14,7 @@ pipeline {
                 sh 'docker build -t node-app .'
             }
         }
-         stage("Build & Test"){
+         stage("Deploy"){
             steps{
                 sh 'docker run -d -p 8000:8000 --name node-app-todo node-app'
             }
