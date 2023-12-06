@@ -9,8 +9,6 @@ pipeline {
         }
         stage("Build & Test"){
             steps{
-                sh 'docker stop node-app-todo'
-                sh 'docker rm node-app-todo'
                 sh 'docker build -t node-app .'
             }
         }
