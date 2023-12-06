@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage("Checkout") {
             steps {
-                git url: "git 'https://github.com/ABHISHEK-KUMAR-14022001/node-todo-cicd.git'", branch: "master"
+                git url: 'https://github.com/ABHISHEK-KUMAR-14022001/node-todo-cicd.git', branch: 'master'
             }
         }
         stage("Build & Test"){
