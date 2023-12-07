@@ -9,6 +9,8 @@ pipeline {
         }
         stage("Build & Test"){
             steps{
+                bat 'docker stop node-app-todo'
+                bat 'docker rm node-app-todo'
                 bat 'docker build -t abhishekkumar1402/node-app .'
             }
         }
