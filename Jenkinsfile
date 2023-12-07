@@ -9,12 +9,14 @@ pipeline {
         }
         stage("Build & Test"){
             steps{
-                sh 'docker build -t node-app .'
+                bat 'docker stop node-app-todo'
+                bat 'docker rm node-app-todo'
+                bat 'docker build -t node-app .'
             }
         }
-         stage("Deploy"){
+        stage("Deploy"){
             steps{
-                sh 'docker run -d -p 8000:8000 --name node-app-todo node-app'
+                bat 'docker run -d -p 8000:8000 --name node-app-todo node-app'
             }
         }
     }
