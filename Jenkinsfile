@@ -9,8 +9,8 @@ pipeline {
         }
         stage("Build & Test"){
             steps{
-                bat 'docker stop node-app-todo || true'
-                bat 'docker rm node-app-todo || true'
+                bat 'docker stop node-app-todo 2>nul || true'
+                bat 'docker rm node-app-todo 2>nul || true'
                 bat 'docker build -t abhishekkumar1402/node-app .'
             }
         }
