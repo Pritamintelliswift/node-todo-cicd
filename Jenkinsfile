@@ -9,6 +9,8 @@ pipeline {
         }
         stage("Build & Test"){
             steps{
+                bat 'docker stop node-app-todo || true'
+                bat 'docker rm node-app-todo || true'
                 bat 'docker build -t abhishekkumar1402/node-app .'
             }
         }
@@ -26,7 +28,7 @@ pipeline {
         }
         stage("Deploy"){
             steps{
-                bat 'docker run -d -p 8000:8000 --name node-app-todo3 abhishekkumar1402/node-app'
+                bat 'docker run -d -p 8000:8000 --name node-app-todo abhishekkumar1402/node-app'
             }
         }
     }
