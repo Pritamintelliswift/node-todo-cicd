@@ -26,9 +26,11 @@ pipeline {
             }
             }
         }
-        stage("Deploy"){
+        stage("Kubernetes"){
             steps{
-                bat 'docker run -d -p 8000:8000 --name node-app-todo abhishekkumar1402/node-app'
+               script{
+               kubernetesDeploy (configs: 'service.yaml',kubeconfigId: 'k8sconfigure')
+            }
             }
         }
     }
