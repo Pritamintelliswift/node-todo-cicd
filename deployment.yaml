@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: todo-app
-        image: us-central1-docker.pkg.dev/enhanced-hawk-433105-p3/abhishekkumar1402/node-app:latest
+        image: us-central1-docker.pkg.dev/internaldevopsproject/abhishekkumar1402/node-app:latest
         ports:
         - containerPort: 8000
         
