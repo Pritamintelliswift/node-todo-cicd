@@ -17,11 +17,11 @@ on:
         required: true
       GIT_BRANCH:
         description: 'Git Branch to checkout'
-        default: 'idp_infra'
+        default: 'master'  # ✅ updated from idp_infra
         required: true
       GIT_REPO:
-        description: 'GitHub repository in owner/repo format'
-        default: 'Pritamintelliswift/node-todo-cicd'
+        description: 'GitHub repository in {owner}/{repo} format'
+        default: 'Pritamintelliswift/node-todo-cicd'  # ✅ use correct format, not full URL
         required: true
 
 jobs:
