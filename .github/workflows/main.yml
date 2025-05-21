@@ -19,8 +19,8 @@ on:
         description: 'Git Branch to checkout'
         default: 'idp_infra'
         required: true
-      GIT_URL:
-        description: 'Git Repository URL'
+      GIT_REPO:
+        description: 'GitHub repository in owner/repo format'
         default: 'Pritamintelliswift/node-todo-cicd'
         required: true
 
@@ -32,9 +32,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.event.inputs.GIT_URL }}
+        repository: ${{ github.event.inputs.GIT_REPO }}
         ref: ${{ github.event.inputs.GIT_BRANCH }}
-        token: ${{ secrets.GITLAB_TOKEN }} # Add this secret
 
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
