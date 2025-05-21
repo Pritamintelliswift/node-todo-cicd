@@ -21,7 +21,7 @@ on:
         required: true
       GIT_URL:
         description: 'Git Repository URL'
-        default: 'https://github.com/Pritamintelliswift/node-todo-cicd.git'
+        default: 'Pritamintelliswift/node-todo-cicd'
         required: true
 
 jobs:
