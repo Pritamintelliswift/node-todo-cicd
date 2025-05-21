@@ -1,0 +1,97 @@
+name: Deploy Node App to GKE
+
+on:
+  workflow_dispatch:
+    inputs:
+      GOOGLE_PROJECT_ID:
+        description: 'Google Project ID'
+        default: 'idp-project-deploy'
+        required: true
+      CLUSTER_NAME:
+        description: 'Name of the Cluster'
+        default: 'first-cluster'
+        required: true
+      REGION:
+        description: 'Region'
+        default: 'us-central1-a'
+        required: true
+      GIT_BRANCH:
+        description: 'Git Branch to checkout'
+        default: 'idp_infra'
+        required: true
+      GIT_URL:
+        description: 'Git Repository URL'
+        default: 'https://github.com/Pritamintelliswift/node-todo-cicd.git'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.event.inputs.GIT_URL }}
+        ref: ${{ github.event.inputs.GIT_BRANCH }}
+        token: ${{ secrets.GITLAB_TOKEN }} # Add this secret
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        version: 'latest'
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID }}
+
+    - name: Configure Docker to use GCR
+      run: |
+        gcloud auth configure-docker us-central1-docker.pkg.dev
+
+    - name: Check gke-gcloud-auth-plugin
+      run: |
+        if which gke-gcloud-auth-plugin > /dev/null; then
+          echo "gke-gcloud-auth-plugin is installed"
+        else
+          echo "gke-gcloud-auth-plugin is not installed"
+          exit 1
+        fi
+
+    - name: Get GKE credentials
+      run: |
+        gcloud container clusters get-credentials ${{ github.event.inputs.CLUSTER_NAME }} \
+          --zone ${{ github.event.inputs.REGION }} \
+          --project ${{ github.event.inputs.GOOGLE_PROJECT_ID }}
+
+    - name: Pull Docker image from Artifact Registry
+      run: |
+        docker pull us-central1-docker.pkg.dev/idp-project-deploy/abhishekkumar1402/node-app:latest
+
+    - name: Deploy Node Application
+      run: |
+        echo "Deploying node application"
+        kubectl apply -f deployment.yaml
+
+    - name: Wait for External IP
+      run: |
+        echo "Waiting for external IP..."
+        retries=0
+        while [ $retries -lt 60 ]; do
+          external_ip=$(kubectl get svc todo-service -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
+          if [ -n "$external_ip" ]; then
+            echo "Node application is deployed at http://$external_ip:80"
+            break
+          fi
+          echo "External IP not assigned yet. Retrying in 60 seconds..."
+          sleep 60
+          retries=$((retries + 1))
+        done
+
+        if [ -z "$external_ip" ]; then
+          echo "Failed to get external IP for the service after $((retries * 60)) seconds."
+          exit 1
+        fi
+
+    - name: Get Kubernetes pods
+      run: |
+        echo "Getting Kubernetes pods"
+        kubectl get pods -o wide
