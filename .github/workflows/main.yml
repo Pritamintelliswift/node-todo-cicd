@@ -43,7 +43,7 @@ jobs:
       with:
         version: 'latest'
         service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy' }}
+        project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy-455506' }}
 
     - name: Authenticate service account
       run: |
