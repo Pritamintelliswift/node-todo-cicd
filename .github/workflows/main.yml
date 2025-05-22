@@ -1,5 +1,4 @@
 name: Deploy Node App to GKE
-
 on:
   push:
     branches:
@@ -26,25 +25,21 @@ on:
         description: 'GitHub repository in {owner}/{repo} format'
         default: 'Pritamintelliswift/node-todo-cicd'
         required: true
-
 jobs:
   deploy:
     runs-on: ubuntu-22.04
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         repository: ${{ github.event.inputs.GIT_REPO || github.repository }}
         ref: ${{ github.event.inputs.GIT_BRANCH || github.ref_name }}
-
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
       with:
         version: 'latest'
         service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy-455506' }}
-
+        project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy' }}
     - name: Authenticate service account
       run: |
         echo '${{ secrets.GCP_SA_KEY }}' > ${HOME}/gcloud-key.json
@@ -52,15 +47,12 @@ jobs:
         ACCOUNT_EMAIL=$(gcloud config get-value account)
         echo "Authenticated as $ACCOUNT_EMAIL"
         gcloud config set account $ACCOUNT_EMAIL
-
     - name: Configure Docker to use Artifact Registry
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
-
     - name: Install gke-gcloud-auth-plugin
       run: |
         gcloud components install gke-gcloud-auth-plugin --quiet
-
     - name: Check gke-gcloud-auth-plugin
       run: |
         if which gke-gcloud-auth-plugin > /dev/null; then
@@ -69,22 +61,18 @@ jobs:
           echo "gke-gcloud-auth-plugin is not installed"
           exit 1
         fi
-
     - name: Get GKE credentials
       run: |
         gcloud container clusters get-credentials ${{ github.event.inputs.CLUSTER_NAME || 'first-cluster' }} \
           --zone ${{ github.event.inputs.REGION || 'us-central1-a' }} \
-          --project ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy' }}
-
+          --project ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy-455506' }}
     - name: Pull Docker image from Artifact Registry
       run: |
-        docker pull us-central1-docker.pkg.dev/idp-project-deploy/abhishekkumar1402/node-app:latest
-
+        docker pull abhishekkumar1402/node-app:latest
     - name: Deploy Node Application
       run: |
         echo "Deploying node application"
         kubectl apply -f deployment.yaml
-
     - name: Wait for External IP
       run: |
         echo "Waiting for external IP..."
@@ -99,12 +87,10 @@ jobs:
           sleep 60
           retries=$((retries + 1))
         done
-
         if [ -z "$external_ip" ]; then
           echo "Failed to get external IP for the service after $((retries * 60)) seconds."
           exit 1
         fi
-
     - name: Get Kubernetes pods
       run: |
         echo "Getting Kubernetes pods"
