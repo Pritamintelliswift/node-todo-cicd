@@ -27,7 +27,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-22.04
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -35,21 +34,16 @@ jobs:
         repository: ${{ github.event.inputs.GIT_REPO }}
         ref: ${{ github.event.inputs.GIT_BRANCH }}
 
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
       with:
         version: 'latest'
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID }}
-
-    - name: Authenticate service account
-      run: |
-        echo '${{ secrets.GCP_SA_KEY }}' > ${HOME}/gcloud-key.json
-        gcloud auth activate-service-account --key-file=${HOME}/gcloud-key.json
-        ACCOUNT_EMAIL=$(gcloud config get-value account)
-        echo "Authenticated as $ACCOUNT_EMAIL"
-        gcloud config set account $ACCOUNT_EMAIL
-        gcloud config set project ${{ github.event.inputs.GOOGLE_PROJECT_ID }}
 
     - name: Configure Docker to use Artifact Registry
       run: |
@@ -59,15 +53,6 @@ jobs:
       run: |
         gcloud components install gke-gcloud-auth-plugin --quiet
 
-    - name: Check gke-gcloud-auth-plugin
-      run: |
-        if which gke-gcloud-auth-plugin > /dev/null; then
-          echo "gke-gcloud-auth-plugin is installed"
-        else
-          echo "gke-gcloud-auth-plugin is not installed"
-          exit 1
-        fi
-
     - name: Get GKE credentials
       run: |
         gcloud container clusters get-credentials ${{ github.event.inputs.CLUSTER_NAME }} \
@@ -76,7 +61,7 @@ jobs:
 
     - name: Pull Docker image from Artifact Registry
       run: |
-        docker pull us-central1-docker.pkg.dev/${{ github.event.inputs.GOOGLE_PROJECT_ID }}/abhishekkumar1402/node-app:latest
+        docker pull abhishekkumar1402/node-app:latest
 
     - name: Deploy Node Application
       run: |
