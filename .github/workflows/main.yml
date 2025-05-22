@@ -1,9 +1,6 @@
 name: Deploy Node App to GKE
 
 on:
-  push:
-    branches:
-      - master  # Trigger when pushing to master
   workflow_dispatch:
     inputs:
       GOOGLE_PROJECT_ID:
@@ -22,9 +19,9 @@ on:
         description: 'Git Branch to checkout'
         default: 'idp_infra'
         required: true
-      GIT_URL:
-        description: 'Git Repository URL (HTTPS format only)'
-        default: 'http://git.intelliswift.com/DevOps_Internal/DevopsInternal_Project.git'
+      GIT_REPO:
+        description: 'GitHub repository in {owner}/{repo} format'
+        default: 'Pritamintelliswift/node-todo-cicd'
         required: true
 
 jobs:
@@ -35,7 +32,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.event.inputs.GIT_URL }}
+        repository: ${{ github.event.inputs.GIT_REPO }}
         ref: ${{ github.event.inputs.GIT_BRANCH }}
 
     - name: Set up Google Cloud SDK
@@ -79,7 +76,7 @@ jobs:
 
     - name: Pull Docker image from Artifact Registry
       run: |
-        docker pull us-central1-docker.pkg.dev/idp-project-deploy/abhishekkumar1402/node-app:latest
+        docker pull us-central1-docker.pkg.dev/${{ github.event.inputs.GOOGLE_PROJECT_ID }}/abhishekkumar1402/node-app:latest
 
     - name: Deploy Node Application
       run: |
