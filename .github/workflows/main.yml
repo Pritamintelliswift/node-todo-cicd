@@ -17,7 +17,7 @@ on:
         required: true
       GIT_BRANCH:
         description: 'Git Branch to checkout'
-        default: 'idp_infra'
+        default: 'master'
         required: true
       GIT_REPO:
         description: 'GitHub repository in {owner}/{repo} format'
