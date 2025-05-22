@@ -3,7 +3,7 @@ name: Deploy Node App to GKE
 on:
   push:
     branches:
-      - master  # Trigger when pushing to master
+      - master  # Trigger when pushing to master run
   workflow_dispatch:
     inputs:
       GOOGLE_PROJECT_ID:
