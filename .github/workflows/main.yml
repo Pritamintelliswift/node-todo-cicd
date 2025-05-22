@@ -45,6 +45,11 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy' }}
 
+    - name: Authenticate service account
+      run: |
+        echo '${{ secrets.GCP_SA_KEY }}' > ${HOME}/gcloud-key.json
+        gcloud auth activate-service-account --key-file=${HOME}/gcloud-key.json
+
     - name: Configure Docker to use Artifact Registry
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
