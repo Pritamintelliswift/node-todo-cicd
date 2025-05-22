@@ -1,29 +1,3 @@
-name: Deploy Node App to GKE
-
-on:
-  workflow_dispatch:
-    inputs:
-      GOOGLE_PROJECT_ID:
-        description: 'Google Project ID'
-        default: 'idp-project-deploy'
-        required: true
-      CLUSTER_NAME:
-        description: 'Name of the Cluster'
-        default: 'first-cluster'
-        required: true
-      REGION:
-        description: 'Region'
-        default: 'us-central1-a'
-        required: true
-      GIT_BRANCH:
-        description: 'Git Branch to checkout'
-        default: 'master'  # ✅ updated from idp_infra
-        required: true
-      GIT_REPO:
-        description: 'GitHub repository in {owner}/{repo} format'
-        default: 'Pritamintelliswift/node-todo-cicd'  # ✅ use correct format, not full URL
-        required: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -45,6 +19,11 @@ jobs:
     - name: Configure Docker to use GCR
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
+
+    - name: Install gke-gcloud-auth-plugin
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
 
     - name: Check gke-gcloud-auth-plugin
       run: |
