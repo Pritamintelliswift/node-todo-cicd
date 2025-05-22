@@ -1,3 +1,32 @@
+name: Deploy Node App to GKE
+
+on:
+  push:
+    branches:
+      - master  # Trigger when pushing to master
+  workflow_dispatch:
+    inputs:
+      GOOGLE_PROJECT_ID:
+        description: 'Google Project ID'
+        default: 'idp-project-deploy'
+        required: true
+      CLUSTER_NAME:
+        description: 'Name of the Cluster'
+        default: 'first-cluster'
+        required: true
+      REGION:
+        description: 'Region'
+        default: 'us-central1-a'
+        required: true
+      GIT_BRANCH:
+        description: 'Git Branch to checkout'
+        default: 'master'
+        required: true
+      GIT_REPO:
+        description: 'GitHub repository in {owner}/{repo} format'
+        default: 'Pritamintelliswift/node-todo-cicd'
+        required: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -6,17 +35,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.event.inputs.GIT_REPO }}
-        ref: ${{ github.event.inputs.GIT_BRANCH }}
+        repository: ${{ github.event.inputs.GIT_REPO || github.repository }}
+        ref: ${{ github.event.inputs.GIT_BRANCH || github.ref_name }}
 
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
       with:
         version: 'latest'
         service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID }}
+        project_id: ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy' }}
 
-    - name: Configure Docker to use GCR
+    - name: Configure Docker to use Artifact Registry
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
 
@@ -36,9 +65,9 @@ jobs:
 
     - name: Get GKE credentials
       run: |
-        gcloud container clusters get-credentials ${{ github.event.inputs.CLUSTER_NAME }} \
-          --zone ${{ github.event.inputs.REGION }} \
-          --project ${{ github.event.inputs.GOOGLE_PROJECT_ID }}
+        gcloud container clusters get-credentials ${{ github.event.inputs.CLUSTER_NAME || 'first-cluster' }} \
+          --zone ${{ github.event.inputs.REGION || 'us-central1-a' }} \
+          --project ${{ github.event.inputs.GOOGLE_PROJECT_ID || 'idp-project-deploy' }}
 
     - name: Pull Docker image from Artifact Registry
       run: |
