@@ -5,7 +5,7 @@ on:
     inputs:
       GOOGLE_PROJECT_ID:
         description: 'Google Project ID'
-        default: 'idp-project-deploy'
+        default: 'idp-project-deploy-455506'
         required: true
       CLUSTER_NAME:
         description: 'Name of the Cluster'
