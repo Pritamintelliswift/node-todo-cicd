@@ -1,7 +1,8 @@
-﻿const brokenFunction = () => {
-  console.log("This is missing a closing bracket and semicolon"
-  let x = 5
-  if (x > 3 {
-    console.log("Missing closing parenthesis"
+﻿const fixedFunction = () => {
+  console.log("This now has proper syntax");
+  let x = 5;
+  if (x > 3) {
+    console.log("Fixed closing parenthesis");
   }
-  // Multiple syntax errors above
+  // All syntax errors fixed
+};
